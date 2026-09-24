@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nazrul Islam</title>
+<style>
+  :root{
+    --paper:#F4F2EC;
+    --surface:#FFFFFF;
+    --ink:#1B2433;
+    --ink-soft:#525B6B;
+    --navy:#1F3864;
+    --navy-soft:#3A5488;
+    --brass:#A47A32;
+    --brass-text:#7C5A24;
+    --brass-tint:rgba(164,122,50,0.12);
+    --line:rgba(27,36,51,0.14);
+    --line-strong:rgba(27,36,51,0.26);
+    --shadow:0 18px 40px -22px rgba(27,36,51,0.35);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#11151B;
+      --surface:#171D26;
+      --ink:#E7E4DC;
+      --ink-soft:#AEB4BF;
+      --navy:#93ABDC;
+      --navy-soft:#6E8BC4;
+      --brass:#C9A86A;
+      --brass-text:#E0BD7C;
+      --brass-tint:rgba(224,189,124,0.14);
+      --line:rgba(231,228,220,0.16);
+      --line-strong:rgba(231,228,220,0.28);
+      --shadow:0 18px 40px -20px rgba(0,0,0,0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11151B;
+    --surface:#171D26;
+    --ink:#E7E4DC;
+    --ink-soft:#AEB4BF;
+    --navy:#93ABDC;
+    --navy-soft:#6E8BC4;
+    --brass:#C9A86A;
+    --brass-text:#E0BD7C;
+    --brass-tint:rgba(224,189,124,0.14);
+    --line:rgba(231,228,220,0.16);
+    --line-strong:rgba(231,228,220,0.28);
+    --shadow:0 18px 40px -20px rgba(0,0,0,0.55);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size:16px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    padding-inline:0;
+  }
+  h1,h2,h3,h4{
+    font-family:"Spectral", Georgia, "Times New Roman", serif;
+    color:var(--ink);
+    margin:0;
+    text-wrap:balance;
+    font-weight:600;
+  }
+  a{color:var(--navy);}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--brass); outline-offset:3px;}
+  img{max-width:100%;}
+  [hidden]{display:none!important;}
+  ::selection{background:var(--brass-tint); color:var(--ink);}
+
+  .skip-link{
+    position:absolute; left:-999px; top:auto;
+    background:var(--navy); color:#fff; padding:.6em 1em; border-radius:.3em; z-index:200;
+  }
+  .skip-link:focus{ left:1em; top:1em; }
+
+  /* ---------- layout helpers ---------- */
+  .wrap{ max-width:1180px; margin-inline:auto; padding-inline:24px; }
+  .prose-wrap{ max-width:800px; margin-inline:auto; padding-inline:24px; }
+  @media (max-width:640px){ .wrap,.prose-wrap{ padding-inline:18px; } }
+
+  .eyebrow{
+    font-family:"Source Sans 3", sans-serif;
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--brass-text);
+    margin:0 0 .6em;
+    display:block;
+  }
+
+  /* ---------- nav ---------- */
+  .site-nav{
+    position:sticky; top:0; z-index:100;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding-top:env(safe-area-inset-top,0px);
+    transition:box-shadow .25s ease;
+  }
+  .site-nav.scrolled{ box-shadow:0 6px 18px -14px rgba(27,36,51,.5); }
+  .nav-inner{
+    max-width:1180px; margin-inline:auto; padding:14px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .brand-mark{
+    width:34px; height:34px; border-radius:50%;
+    background:var(--navy); color:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Spectral",serif; font-weight:700; font-size:.85rem;
+    border:1px solid var(--brass);
+    flex:none;
+  }
+  .brand-name{ font-family:"Spectral",serif; font-weight:600; color:var(--ink); font-size:1.02rem; }
+  .nav-links{ display:flex; gap:28px; }
+  .nav-links a{
+    color:var(--ink-soft); text-decoration:none; font-size:.92rem; font-weight:600;
+    padding-block:4px; border-bottom:2px solid transparent;
+  }
+  .nav-links a:hover, .nav-links a.active{ color:var(--ink); border-bottom-color:var(--brass); }
+  @media (max-width:860px){ .nav-links{ display:none; } }
+
+  .nav-toggle{
+    display:none; flex-direction:column; gap:5px; background:none; border:0; cursor:pointer; padding:8px;
+  }
+  .nav-toggle span{ width:22px; height:2px; background:var(--ink); display:block; }
+  @media (max-width:860px){ .nav-toggle{ display:flex; } }
+
+  .mobile-nav{
+    display:none; flex-direction:column; border-top:1px solid var(--line);
+    background:var(--paper);
+  }
+  .mobile-nav.open{ display:flex; }
+  .mobile-nav a{
+    padding:14px 24px; text-decoration:none; color:var(--ink); font-weight:600;
+    border-bottom:1px solid var(--line);
+  }
+
+  /* ---------- hero ---------- */
+  .hero{ position:relative; overflow:hidden; padding-block:72px 56px; }
+  .hero-inner{
+    max-width:1180px; margin-inline:auto; padding-inline:24px;
+    display:grid; grid-template-columns:1.15fr .85fr; gap:40px; align-items:center;
+  }
+  @media (max-width:900px){ .hero-inner{ grid-template-columns:1fr; } }
+  .hero h1{ font-size:clamp(2.5rem,6vw,4.1rem); line-height:1.04; letter-spacing:-.01em; }
+  .hero .role-line{
+    margin-top:14px; font-size:1.05rem; color:var(--navy); font-weight:600;
+  }
+  .hero .affil-line{ margin-top:6px; color:var(--ink-soft); font-size:.98rem; }
+  .hero p.tagline{
+    margin-top:22px; max-width:56ch; color:var(--ink-soft); font-size:1.08rem;
+  }
+  .hero-actions{ margin-top:28px; display:flex; flex-wrap:wrap; gap:12px; }
+  .chip-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px solid var(--line-strong); background:var(--surface);
+    color:var(--ink); text-decoration:none; font-size:.9rem; font-weight:600;
+    padding:10px 16px; border-radius:999px; cursor:pointer;
+  }
+  .chip-btn:hover{ border-color:var(--brass); color:var(--ink); }
+
+  .hero-graphic{ position:relative; aspect-ratio:1/1; max-width:420px; margin-inline:auto; }
+  .hero-graphic svg{ width:100%; height:100%; }
+  .hero-graphic .node{ fill:var(--navy); }
+  .hero-graphic .node.accent{ fill:var(--brass); }
+  .hero-graphic .edge{ stroke:var(--line-strong); stroke-width:1.2; }
+  @media (max-width:900px){ .hero-graphic{ max-width:260px; opacity:.85; } }
+
+  /* ---------- stats ---------- */
+  .stats{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--surface); }
+  .stats-inner{
+    max-width:1180px; margin-inline:auto; padding:30px 24px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:20px; text-align:center;
+  }
+  @media (max-width:720px){ .stats-inner{ grid-template-columns:repeat(2,1fr); } }
+  .stat b{
+    display:block; font-family:"Spectral",serif; font-size:clamp(1.6rem,3vw,2.2rem);
+    color:var(--navy); font-weight:700;
+  }
+  .stat span{ font-size:.84rem; color:var(--ink-soft); }
+
+  /* ---------- sections ---------- */
+  .section{ padding-block:76px; scroll-margin-top:76px; }
+  .section.alt{ background:var(--surface); border-block:1px solid var(--line); }
+  .section-head{ max-width:640px; margin-bottom:40px; }
+  .section-head h2{ font-size:clamp(1.7rem,3vw,2.3rem); }
+  .section-head p{ margin-top:12px; color:var(--ink-soft); }
+
+  .lede{ max-width:760px; color:var(--ink-soft); font-size:1.05rem; margin-bottom:34px; }
+
+  /* expertise grid */
+  .tag-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:36px; }
+  @media (max-width:900px){ .tag-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px){ .tag-grid{ grid-template-columns:1fr; } }
+  .tag-card{
+    border:1px solid var(--line); background:var(--surface);
+    padding:16px 18px; font-size:.92rem; font-weight:600; border-radius:10px;
+  }
+  .section.alt .tag-card{ background:var(--paper); }
+
+  /* education list */
+  .kv-list{ margin-top:36px; display:flex; flex-direction:column; gap:14px; }
+  .kv-row{ display:flex; gap:18px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  .kv-row:last-child{ border-bottom:0; }
+  .kv-left{ flex:0 0 auto; min-width:180px; font-weight:600; }
+  .kv-right{ color:var(--ink-soft); }
+  @media (max-width:640px){ .kv-row{ flex-direction:column; gap:4px; } .kv-left{ min-width:0; } }
+
+  /* publications */
+  .pub-list{ list-style:none; margin:36px 0 0; padding:0; counter-reset:pub; }
+  .pub-item{
+    counter-increment:pub; position:relative; padding:18px 0 18px 52px;
+    border-bottom:1px solid var(--line); font-size:.98rem;
+  }
+  .pub-item:first-child{ border-top:1px solid var(--line); }
+  .pub-item::before{
+    content:counter(pub);
+    position:absolute; left:0; top:18px;
+    font-family:"Spectral",serif; font-weight:700; color:var(--brass-text); font-size:1rem;
+    width:36px;
+  }
+  .pub-item .jrnl{ font-style:italic; font-family:"Spectral",serif; }
+  .pub-item .tag{
+    display:inline-block; margin-left:8px; font-size:.72rem; font-weight:700;
+    color:var(--navy); border:1px solid var(--line-strong); border-radius:999px;
+    padding:1px 8px; vertical-align:middle;
+  }
+  .pub-item .highlight{
+    display:block; margin-top:6px; color:var(--brass-text); font-weight:700; font-size:.86rem;
+  }
+
+  /* recognition cards */
+  .card-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:44px; }
+  @media (max-width:860px){ .card-row{ grid-template-columns:1fr; } }
+  .rec-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:22px 22px 24px; box-shadow:var(--shadow);
+  }
+  .section.alt .rec-card{ background:var(--paper); }
+  .rec-card h4{ font-size:1.02rem; margin-bottom:8px; }
+  .rec-card p{ margin:0; color:var(--ink-soft); font-size:.92rem; }
+  .press-row{ margin-top:14px; display:flex; flex-wrap:wrap; gap:8px 18px; }
+  .press-row span{ font-size:.86rem; color:var(--ink-soft); font-weight:600; }
+
+  /* grants table */
+  .data-table{ width:100%; border-collapse:collapse; margin-top:20px; font-size:.9rem; }
+  .data-table th{
+    text-align:left; font-family:"Source Sans 3",sans-serif; text-transform:uppercase;
+    letter-spacing:.08em; font-size:.72rem; color:var(--ink-soft); font-weight:700;
+    padding:10px 12px; border-bottom:1px solid var(--line-strong);
+  }
+  .data-table td{ padding:12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .data-table tr:last-child td{ border-bottom:0; }
+  .table-scroll{ overflow-x:auto; }
+  .data-table .num{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* module list */
+  .module-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 40px; margin-top:36px; }
+  @media (max-width:760px){ .module-grid{ grid-template-columns:1fr; } }
+  .module-item{
+    padding:12px 0; border-bottom:1px solid var(--line); font-size:.92rem;
+    display:flex; justify-content:space-between; gap:14px;
+  }
+  .module-item .course{ font-weight:600; }
+  .module-item .inst{ color:var(--ink-soft); text-align:right; flex:0 0 auto; font-size:.85rem; }
+
+  .subhead{ font-family:"Spectral",serif; font-weight:600; font-size:1.15rem; margin:40px 0 6px; }
+  .subhead:first-of-type{ margin-top:0; }
+
+  .student-list{ margin-top:14px; display:flex; flex-direction:column; gap:12px; }
+  .student-item{ padding:12px 16px; background:var(--surface); border:1px solid var(--line); border-radius:10px; font-size:.92rem; }
+  .section.alt .student-item{ background:var(--paper); }
+  .student-item b{ color:var(--ink); }
+
+  /* career timeline */
+  .timeline{ margin-top:40px; position:relative; padding-left:28px; border-left:2px solid var(--line-strong); }
+  .tl-item{ position:relative; padding-bottom:34px; }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-item::before{
+    content:""; position:absolute; left:-34px; top:4px;
+    width:12px; height:12px; border-radius:50%;
+    background:var(--paper); border:2px solid var(--brass);
+  }
+  .tl-years{ font-size:.82rem; font-weight:700; letter-spacing:.05em; color:var(--brass-text); text-transform:uppercase; }
+  .tl-role{ font-family:"Spectral",serif; font-size:1.15rem; font-weight:600; margin-top:4px; }
+  .tl-inst{ color:var(--ink-soft); font-size:.92rem; margin-top:2px; }
+  .tl-note{ margin-top:8px; color:var(--ink-soft); font-size:.92rem; max-width:62ch; }
+
+  /* service */
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:8px; }
+  @media (max-width:820px){ .two-col{ grid-template-columns:1fr; gap:36px; } }
+  .plain-list{ list-style:none; margin:16px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .plain-list li{ padding-bottom:10px; border-bottom:1px solid var(--line); font-size:.92rem; }
+  .plain-list li:last-child{ border-bottom:0; }
+
+  .tag-cloud{ display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .tag-pill{
+    font-size:.82rem; padding:6px 12px; border-radius:999px;
+    background:var(--brass-tint); color:var(--brass-text); font-weight:600;
+  }
+
+  /* books */
+  .book-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:36px; }
+  @media (max-width:760px){ .book-grid{ grid-template-columns:1fr; } }
+  .book-card{
+    display:flex; gap:16px; padding:18px; border:1px solid var(--line); border-radius:10px; background:var(--surface);
+  }
+  .book-spine{
+    flex:0 0 auto; width:14px; border-radius:3px; background:linear-gradient(180deg,var(--navy),var(--navy-soft));
+  }
+  .book-card h4{ font-size:1rem; line-height:1.35; }
+  .book-card p{ margin:6px 0 0; font-size:.85rem; color:var(--ink-soft); }
+  .book-card .btag{
+    display:inline-block; margin-top:8px; font-size:.7rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--brass-text);
+  }
+
+  /* contact */
+  .contact-grid{ display:grid; grid-template-columns:1.1fr .9fr; gap:48px; }
+  @media (max-width:820px){ .contact-grid{ grid-template-columns:1fr; gap:32px; } }
+  .contact-row{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:16px 0; border-bottom:1px solid var(--line);
+  }
+  .contact-row:last-child{ border-bottom:0; }
+  .contact-label{ font-size:.76rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; }
+  .contact-value{ font-size:1rem; font-weight:600; margin-top:2px; }
+  .copy-btn{
+    flex:0 0 auto; border:1px solid var(--line-strong); background:transparent; color:var(--ink-soft);
+    font-size:.78rem; font-weight:600; padding:7px 12px; border-radius:8px; cursor:pointer;
+  }
+  .copy-btn:hover{ border-color:var(--brass); color:var(--ink); }
+  .avail-note{
+    margin-top:26px; padding:18px 20px; border-left:3px solid var(--brass);
+    background:var(--brass-tint); font-size:.94rem; border-radius:0 8px 8px 0;
+  }
+
+  .site-footer{ padding:32px 24px; text-align:center; color:var(--ink-soft); font-size:.84rem; }
+
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{ animation:rise .6s ease both; }
+    @keyframes rise{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:none; } }
+  }
+</style>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-nav" id="siteNav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="Nazrul Islam, back to top">
+      <span class="brand-mark" aria-hidden="true">NI</span>
+      <span class="brand-name">Nazrul Islam</span>
+    </a>
+    <nav class="nav-links" aria-label="Section navigation">
+      <a href="#about">About</a>
+      <a href="#research">Research</a>
+      <a href="#teaching">Teaching</a>
+      <a href="#career">Career</a>
+      <a href="#service">Service</a>
+      <a href="#books">Books</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Section navigation">
+    <a href="#about">About</a>
+    <a href="#research">Research</a>
+    <a href="#teaching">Teaching</a>
+    <a href="#career">Career</a>
+    <a href="#service">Service</a>
+    <a href="#books">Books</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <div>
+        <span class="eyebrow">Chair Professor of Business</span>
+        <h1>Nazrul Islam</h1>
+        <div class="role-line">PhD &middot; Director of Research Degrees (PhD/MPhil) &middot; Co-Director, Centre of FinTech</div>
+        <div class="affil-line">Royal Docks School of Business and Law, University of East London</div>
+        <p class="tagline">Twenty-five years of research and teaching on how organisations adopt and govern new technology &mdash; most recently artificial intelligence, big-data analytics, and digital transformation &mdash; across operations, supply chains, financial services, and the workforce.</p>
+        <div class="hero-actions">
+          <a class="chip-btn" href="#research">View selected publications</a>
+          <a class="chip-btn" href="#contact">Get in touch</a>
+        </div>
+      </div>
+      <div class="hero-graphic" aria-hidden="true">
+        <svg viewBox="0 0 400 400" fill="none">
+          <line class="edge" x1="60" y1="90" x2="160" y2="50"/>
+          <line class="edge" x1="160" y1="50" x2="270" y2="80"/>
+          <line class="edge" x1="270" y1="80" x2="340" y2="160"/>
+          <line class="edge" x1="340" y1="160" x2="310" y2="260"/>
+          <line class="edge" x1="310" y1="260" x2="220" y2="320"/>
+          <line class="edge" x1="220" y1="320" x2="120" y2="290"/>
+          <line class="edge" x1="120" y1="290" x2="60" y2="210"/>
+          <line class="edge" x1="60" y1="210" x2="60" y2="90"/>
+          <line class="edge" x1="160" y1="50" x2="200" y2="150"/>
+          <line class="edge" x1="200" y1="150" x2="120" y2="290"/>
+          <line class="edge" x1="200" y1="150" x2="270" y2="80"/>
+          <line class="edge" x1="200" y1="150" x2="310" y2="260"/>
+          <line class="edge" x1="200" y1="150" x2="60" y2="210"/>
+          <line class="edge" x1="220" y1="320" x2="200" y2="150"/>
+          <circle class="node" cx="60" cy="90" r="7"/>
+          <circle class="node" cx="160" cy="50" r="6"/>
+          <circle class="node accent" cx="270" cy="80" r="8"/>
+          <circle class="node" cx="340" cy="160" r="6"/>
+          <circle class="node" cx="310" cy="260" r="7"/>
+          <circle class="node accent" cx="220" cy="320" r="8"/>
+          <circle class="node" cx="120" cy="290" r="6"/>
+          <circle class="node" cx="60" cy="210" r="7"/>
+          <circle class="node accent" cx="200" cy="150" r="10"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stats-inner">
+      <div class="stat"><b>25+</b><span>Years in higher education</span></div>
+      <div class="stat"><b>90+</b><span>Peer-reviewed articles</span></div>
+      <div class="stat"><b>5</b><span>Books</span></div>
+      <div class="stat"><b>10</b><span>PhD &amp; DBA theses supervised</span></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">About</span>
+        <h2>Profile</h2>
+      </div>
+      <p class="lede">Nazrul Islam is a Chair Professor of Business at the University of East London, where he directs the school&rsquo;s PhD and MPhil programmes and co-directs the Centre of FinTech. His research sits at the intersection of artificial intelligence, big-data analytics, digital transformation, and technology management, with a growing focus on how organisations adopt AI in operations, supply chains, financial services, and the workforce. Over 25 years he has taught and built curriculum &mdash; in person, fully online, and hybrid &mdash; across six UK universities at BSc, MSc, and MBA level, and has supervised doctoral and professional-doctorate researchers to completion across three institutions. His work has been cited in the White House&rsquo;s 2024 Economic Report of the President, and he writes and comments for the <em>Financial Times</em>, <em>The Economist</em>, <em>ZDNet</em>, and <em>The Conversation</em>.</p>
+
+      <div class="subhead">Areas of expertise</div>
+      <div class="tag-grid">
+        <div class="tag-card">Artificial Intelligence &amp; the Future Workforce</div>
+        <div class="tag-card">Digital Transformation &amp; Business Analytics</div>
+        <div class="tag-card">FinTech, Blockchain &amp; Platform Governance</div>
+        <div class="tag-card">Technology &amp; Innovation Management</div>
+        <div class="tag-card">Sustainable Operations &amp; Supply Chains</div>
+        <div class="tag-card">Research Degree Leadership</div>
+        <div class="tag-card">Entrepreneurship &amp; Ecosystem Strategy</div>
+        <div class="tag-card">Accreditation &amp; Faculty Development</div>
+      </div>
+
+      <div class="subhead">Education &amp; qualifications</div>
+      <div class="kv-list">
+        <div class="kv-row"><div class="kv-left">PhD, Innovation Management</div><div class="kv-right">Tokyo Institute of Technology, Japan &middot; 2008</div></div>
+        <div class="kv-row"><div class="kv-left">MEng, Chemical Engineering (Distinction)</div><div class="kv-right">Tokyo Institute of Technology, Japan &middot; 2005</div></div>
+        <div class="kv-row"><div class="kv-left">MSc (Distinction, 1st Class, ranked 1st)</div><div class="kv-right">University of Dhaka, Bangladesh &middot; 1998</div></div>
+        <div class="kv-row"><div class="kv-left">BSc (Distinction, 1st Class, ranked 1st)</div><div class="kv-right">University of Dhaka, Bangladesh &middot; 1996</div></div>
+        <div class="kv-row"><div class="kv-left">Certificate in Executive Leadership</div><div class="kv-right">Sa&iuml;d Business School, University of Oxford &middot; 2026</div></div>
+        <div class="kv-row"><div class="kv-left">Professional Fellow, Higher Education Academy (PFHEA)</div><div class="kv-right">United Kingdom</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH -->
+  <section class="section alt" id="research">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Research</span>
+        <h2>Selected publications</h2>
+        <p>A selection from more than 90 peer-reviewed articles in ABS 3&ndash;4*, FT-50, and ABDC-A*-ranked journals, chosen for their relevance to artificial intelligence and data-driven decision-making. Full publication list available on request.</p>
+      </div>
+
+      <ol class="pub-list">
+        <li class="pub-item">Tian, J., Chen, L., Islam, N., Jia, F. (2026). Applying Text Mining in Operations and Engineering Management: Guidelines and Challenges in Sentiment Analysis and Topic Modeling. <span class="jrnl">IEEE Transactions on Engineering Management</span>, 73, 3217&ndash;3230.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Xia, H., Islam, N., Zhu, D., Zhang, J.Z., Behl, A., Roohanifar, M. (2026). A Novel Method of Fusing BERT-LSTM and XAI for Social Media Disinformation Identification. <span class="jrnl">Annals of Operations Research</span>, 1&ndash;25.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Jia, F., Islam, N., Chen, L., Fu, X. (2026). Enabling Innovation Capabilities Through Digital Technology Adoption: A Supply Chain Management Perspective. <span class="jrnl">Technological Forecasting and Social Change</span>, 226, 124572.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Agrawal, R., Islam, N., Samadhiya, A., Shukla, V., Kumar, A., Upadhyay, A. (2025). Paving the Way to Environmental Sustainability: A Systematic Review to Integrate Big Data Analytics into High-Stake Decision Forecasting. <span class="jrnl">Technological Forecasting and Social Change</span>, 214, 124060&ndash;124080.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Li, L., Li, J., Islam, N., Zhang, J., Behl, A. (2025). Empowering Firms with AI-Generated Content: Strategic Approaches to R&amp;D and Advertising in the Era of Generative AI. <span class="jrnl">IEEE Transactions on Engineering Management</span>, 72, 1787&ndash;1798.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Kulichyova, A., Islam, N., Kazantsev, N., White, L. (2025). Digital Transformation in Large Established Organizations: Four Restructuring Dilemmas based on Dynamic Capabilities. <span class="jrnl">International Journal of Management Reviews</span>, 27, 420&ndash;450.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Islam, N., Rakshit, S., Paul, T. (2025). Antecedents and Consequences of Social Robots Adoption for SMEs. <span class="jrnl">Technological Forecasting and Social Change</span>, 210, 123887&ndash;123902.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Paul, T., Islam, N., Rakshit, S., Mondal, S., Jeyaraj, A. (2025). The Impact of Artificial Intelligence (AI)-Enabled Collaborative Approach: Achieving Sustainable Supply Chain Performance. <span class="jrnl">Journal of Business Logistics</span>, 46(4), 1&ndash;25.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Alzeiby, F.A., Islam, N., Shaik, A.S., Yaqub, M.Z. (2025). AI Adoption in Enterprises for Enhanced Strategic Human Resource Management Practices. <span class="jrnl">Journal of Enterprise Information Management</span>, ahead-of-print.<span class="tag">ABS 2*</span></li>
+        <li class="pub-item">Uddin, M.H., Mollah, S., Islam, N., Ali, M.H. (2023). Does Digital Transformation Matter for Operational Risk Exposure? <span class="jrnl">Technological Forecasting and Social Change</span>, 197, 122919&ndash;122938.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Balasubramanium, S., Shukla, V., Islam, N., Upadhyay, A., Duong, L. (2023). Applying Artificial Intelligence in Healthcare: Lessons from the COVID-19 Pandemic. <span class="jrnl">International Journal of Production Research</span>, 63(2), 594&ndash;627.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Zirar, A., Ali, S.I., Islam, N. (2023). Worker and Workplace Artificial Intelligence (AI) Coexistence: Emerging Themes and Research Agenda. <span class="jrnl">Technovation</span>, 124, 102747&ndash;102763.<span class="tag">ABS 3*</span><span class="highlight">Cited in the White House&rsquo;s 2024 Economic Report of the President</span></li>
+        <li class="pub-item">Sharma, S., Singh, G., Islam, N., Dhir, A. (2022). Why Do SMEs Adopt Artificial Intelligence-based Chatbots? <span class="jrnl">IEEE Transactions on Engineering Management</span>, 71, 1773&ndash;1786.<span class="tag">ABS 3*</span></li>
+        <li class="pub-item">Malodia, S., Islam, N., Kaur, P., Dhir, A. (2021). Why do People Use Artificial Intelligence (AI)-enabled Voice Assistants? <span class="jrnl">IEEE Transactions on Engineering Management</span>.<span class="tag">ABS 3*</span></li>
+      </ol>
+
+      <div class="card-row">
+        <div class="rec-card">
+          <h4>Cited by the White House</h4>
+          <p>Research on worker&ndash;AI coexistence (Zirar, Ali &amp; Islam, 2023, <em>Technovation</em>) cited in the White House&rsquo;s 2024 Economic Report of the President.</p>
+        </div>
+        <div class="rec-card">
+          <h4>Policy keynote</h4>
+          <p>Featured Keynote Speaker, UK Social Mobility Commission, September 2025 &mdash; &ldquo;The Intersection of AI, the Workforce, and Social Mobility.&rdquo;</p>
+        </div>
+        <div class="rec-card">
+          <h4>In the press</h4>
+          <p>Expert commentary and features on AI, workforce transformation, and digital innovation.</p>
+          <div class="press-row">
+            <span>Financial Times</span><span>The Economist</span><span>The Guardian</span><span>ZDNet</span><span>Outlook Business</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="subhead">Research grants &amp; fellowships</div>
+      <p style="color:var(--ink-soft); font-size:.92rem; margin-top:-4px;">18 competitively secured grants and fellowships since 2002, from UK Research Councils, HEIF, and international partners.</p>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Project</th><th>Funder &amp; role</th><th>Amount</th><th>Years</th></tr></thead>
+          <tbody>
+            <tr><td>Translating AI-Enabled Workforce Transformation Research into Policy Action</td><td>UEL Policy Impact &amp; Participatory Research &middot; PI</td><td class="num">&pound;10,000</td><td>2025&ndash;26</td></tr>
+            <tr><td>Partnerships for AI/FinTech Workforce Development</td><td>UEL Knowledge Exchange &middot; PI</td><td class="num">&pound;10,000</td><td>2025&ndash;26</td></tr>
+            <tr><td>The Metaverse: Theoretical, Legal &amp; Policy Perspectives</td><td>UK HEIF (QR) &middot; PI</td><td class="num">&pound;10,000</td><td>2023&ndash;24</td></tr>
+            <tr><td>Trade Restrictions &amp; Financial Distress in Supply Chains</td><td>RDSBL Seed Funding &middot; PI</td><td class="num">&pound;5,000</td><td>2024</td></tr>
+            <tr><td>AI in Product Development: Is It Worth Investing?</td><td>UK HEIF (QR) &middot; PI</td><td class="num">&pound;10,000</td><td>2023</td></tr>
+            <tr><td>Macro&ndash;Meso&ndash;Micro Enablers/Barriers of Nanotechnology Commercialisation</td><td>University of Newcastle, Australia &middot; Co-PI</td><td class="num">AUD 100,000</td><td>2021&ndash;25</td></tr>
+            <tr><td>AI Innovation Ecosystem in Ageing Society and Smart City</td><td>Rennes Business School, France &middot; PI</td><td class="num">&euro;15,500</td><td>2020</td></tr>
+            <tr><td>International Partnership with UIUC &amp; University of New Mexico</td><td>Exeter Outward Mobility Fellowship &middot; PI</td><td class="num">&pound;10,000</td><td>2018</td></tr>
+            <tr><td>Modelling Discontinuous Innovation and Social Change</td><td>Sustainability &amp; Circular Economy Cluster, w/ Surrey &middot; Co-I</td><td class="num">&pound;5,500</td><td>2017&ndash;18</td></tr>
+            <tr><td>Evolution of Cancer Immunotherapies</td><td>Organisations in Transition, w/ Kyoto University &middot; PI</td><td class="num">&pound;7,500</td><td>2016&ndash;17</td></tr>
+            <tr><td>Innovation in Digital Publishing: Comparative Study</td><td>Organisations in Transition, w/ ITS India &middot; PI</td><td class="num">&pound;7,500</td><td>2016&ndash;17</td></tr>
+            <tr><td>Collaboration Structure in Nanotechnology Innovation Systems</td><td>Glyn Rowland Research Grants, Wales &middot; PI &amp; Mentor</td><td class="num">&pound;45,000</td><td>2011&ndash;14</td></tr>
+            <tr><td>Staff Mobility, Julius-Maximilians-Universit&auml;t W&uuml;rzburg</td><td>British Council Erasmus &middot; PI</td><td class="num">&pound;5,500</td><td>2013</td></tr>
+            <tr><td>Learning and Teaching Fellowship</td><td>Aberystwyth University (AULTF) &middot; PI</td><td class="num">&pound;5,000</td><td>2013</td></tr>
+            <tr><td>UK Industry Uptake of Nanotech &amp; Diffusion Support</td><td>Aberystwyth University Research Fund &middot; PI</td><td class="num">&pound;6,000</td><td>2011&ndash;13</td></tr>
+            <tr><td>Technological Forecasting Decision-Support for Emerging/Disruptive Technologies</td><td>EPSRC Research Fellowship &middot; Work Package Lead</td><td class="num">&pound;50,000</td><td>2008&ndash;09</td></tr>
+            <tr><td>Socio-Technical Appraisal of Hydrogen Energy Technologies</td><td>EPSRC SUPERGEN XIV Consortium &middot; Work Package Lead</td><td class="num">&pound;35,000</td><td>2009&ndash;10</td></tr>
+            <tr><td>Fluorous Nanoflow Systems &amp; Nanotechnology Systems of Innovation</td><td>MEXT, Government of Japan &middot; Doctoral Grant</td><td class="num">&yen;126,000,000</td><td>2002&ndash;08</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACHING -->
+  <section class="section" id="teaching">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Teaching</span>
+        <h2>Teaching &amp; supervision</h2>
+        <p>Twenty-five years of module leadership and curriculum design across six UK universities, in person, fully online, and hybrid, with sustained student satisfaction scores of 4.0 out of 5.0 or higher. Professional Fellow of the UK Higher Education Academy; Deputy Director of Education, University of Exeter Business School (2016&ndash;2018), with school-wide oversight of curriculum design and quality assurance.</p>
+      </div>
+
+      <div class="stats-inner" style="padding:0; margin-bottom:44px;">
+        <div class="stat"><b>10</b><span>PhD &amp; DBA theses to completion</span></div>
+        <div class="stat"><b>5</b><span>PhD students currently supervised</span></div>
+        <div class="stat"><b>1</b><span>Postdoctoral researcher supervised</span></div>
+        <div class="stat"><b>~10/yr</b><span>Dissertation students (Exeter)</span></div>
+      </div>
+
+      <div class="subhead">Modules developed and led</div>
+      <div class="module-grid">
+        <div class="module-item"><span class="course">SG7059 &mdash; Applied Business Project (MSc/MBA)</span><span class="inst">Univ. of East London</span></div>
+        <div class="module-item"><span class="course">BEMM178 &mdash; Innovation Management (MSc/MBA)</span><span class="inst">Univ. of Exeter</span></div>
+        <div class="module-item"><span class="course">BEM3058 &mdash; Innovation Management (BSc)</span><span class="inst">Univ. of Exeter</span></div>
+        <div class="module-item"><span class="course">BEMM223 &mdash; Operations &amp; Project Management (MSc, online)</span><span class="inst">Univ. of Exeter</span></div>
+        <div class="module-item"><span class="course">BEMM114 &mdash; Managing Operations (MSc)</span><span class="inst">Univ. of Exeter</span></div>
+        <div class="module-item"><span class="course">BEMM251 &mdash; Postgraduate Dissertation (MSc)</span><span class="inst">Univ. of Exeter</span></div>
+        <div class="module-item"><span class="course">MT0937A &mdash; Innovation Management (BSc)</span><span class="inst">Abertay Univ.</span></div>
+        <div class="module-item"><span class="course">MT1148A &mdash; Int&rsquo;l Supply Chain Management (BSc)</span><span class="inst">Abertay Univ.</span></div>
+        <div class="module-item"><span class="course">MMM6720 &mdash; Innovation &amp; Operations Mgmt (MSc)</span><span class="inst">Aberystwyth Univ.</span></div>
+        <div class="module-item"><span class="course">MBM6010 &mdash; Research Methods for Managers (MBA)</span><span class="inst">Aberystwyth Univ.</span></div>
+        <div class="module-item"><span class="course">MBM432 &mdash; Operations Management (MBA)</span><span class="inst">Middlesex Univ.</span></div>
+        <div class="module-item"><span class="course">MBA4642 &mdash; Products/Processes Management (MBA)</span><span class="inst">Middlesex Univ.</span></div>
+      </div>
+
+      <div class="subhead">Current PhD students (University of East London)</div>
+      <div class="student-list">
+        <div class="student-item"><b>Khalid Baroom</b> (Year 3) &mdash; Adoption of Industry 5.0 in the Construction Sector in Saudi Arabia: Technology Integration and Human&ndash;Machine Collaboration.</div>
+        <div class="student-item"><b>Letor Lee</b> (Year 3) &mdash; Transforming Small Local Businesses into Global Brands Using Technological Transformation: Obstacles and Challenges.</div>
+        <div class="student-item"><b>Muhammad Rehman Tanoli</b> (Year 3) &mdash; How Central Bank Digital Currency Affects UK Household and Business Payments and Meets Future Payment Needs.</div>
+        <div class="student-item"><b>Collins Takyi</b> (Year 2) &mdash; Financial Inclusion, Income Inequality Impact on Economic Growth in Developed Economies.</div>
+        <div class="student-item"><b>Ahmad Abid</b> (Year 2) &mdash; Procurement Production and Sustainable Sourcing: A Sustainable Mobile Production Topology for Cross-Border Production Cities.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAREER -->
+  <section class="section alt" id="career">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Career</span>
+        <h2>Academic appointments</h2>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-years">2022 &ndash; Present</div>
+          <div class="tl-role">Chair Professor of Business &amp; Director of Research Degrees (PhD/MPhil)</div>
+          <div class="tl-inst">University of East London, Royal Docks School of Business and Law</div>
+          <p class="tl-note">Directs all PhD/MPhil provision school-wide; chairs the Research Degrees Committee; co-directs the Centre of FinTech.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-years">2016 &ndash; 2022</div>
+          <div class="tl-role">Associate Professor of Innovation &amp; Entrepreneurship</div>
+          <div class="tl-inst">University of Exeter Business School</div>
+          <p class="tl-note">Deputy Director of Education (2016&ndash;18); concurrently Director of Doctoral Studies, University of the West of Scotland London (2018&ndash;22).</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-years">2014 &ndash; 2015</div>
+          <div class="tl-role">Senior Lecturer, Innovation Management &amp; REF Director/Coordinator</div>
+          <div class="tl-inst">Dundee Business School, Abertay University</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-years">2010 &ndash; 2014</div>
+          <div class="tl-role">Lecturer &amp; Director of Postgraduate Research (PhD)</div>
+          <div class="tl-inst">Aberystwyth Business School, Aberystwyth University</div>
+          <p class="tl-note">Chair of the Postgraduate Examination Board (2012&ndash;14); Visiting Professor, Middlesex University London and Julius-Maximilians-Universit&auml;t W&uuml;rzburg.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-years">2009 &ndash; 2010</div>
+          <div class="tl-role">Research Associate, SUPERGEN Low Carbon Research Institute</div>
+          <div class="tl-inst">School of Architecture, Cardiff University</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-years">2008 &ndash; 2009</div>
+          <div class="tl-role">Research Associate, Innovative Manufacturing Research Centre</div>
+          <div class="tl-inst">Cardiff Business School, Cardiff University</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-years">2005 &ndash; 2008</div>
+          <div class="tl-role">Teaching Assistant, Management of Technology</div>
+          <div class="tl-inst">Graduate School of Innovation Management, Tokyo Institute of Technology</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-years">1999 &ndash; 2008</div>
+          <div class="tl-role">Lecturer &rarr; Assistant Professor, Applied Chemistry &amp; Chemical Engineering</div>
+          <div class="tl-inst">Faculty of Engineering &amp; Technology, University of Dhaka <span style="opacity:.75">(study leave 2002&ndash;08)</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICE -->
+  <section class="section" id="service">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Editorial &amp; Service</span>
+        <h2>Editorial roles &amp; professional service</h2>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="subhead" style="margin-top:0;">Editorial leadership</div>
+          <ul class="plain-list">
+            <li><b>Associate Editor</b> &mdash; Technological Forecasting and Social Change</li>
+            <li><b>Department Editor</b> &mdash; IEEE Transactions on Engineering Management</li>
+            <li><b>Editor-in-Chief</b> &mdash; International Journal of Technology Intelligence and Planning</li>
+            <li><b>Lead Guest Editor</b> &mdash; Technovation; Technological Forecasting and Social Change; IEEE Transactions on Engineering Management</li>
+          </ul>
+
+          <div class="subhead">Leadership &amp; professional service</div>
+          <ul class="plain-list">
+            <li>Vice President for Publications, IAMOT (2026&ndash;present); Executive Board Member (2025&ndash;present)</li>
+            <li>Chair, Research Degrees Committee, Royal Docks School of Business and Law</li>
+            <li>President, BAASANA UK Chapter (2016&ndash;present); Board of Directors, BAASANA, USA (2014&ndash;present)</li>
+            <li>Director &amp; Chair of PhD Colloquium, PICMET Annual Conference (2015&ndash;18)</li>
+            <li>Advisor &amp; Faculty Partner, Global Scaling Challenge, University of New Mexico (2021&ndash;present)</li>
+          </ul>
+        </div>
+        <div>
+          <div class="subhead" style="margin-top:0;">External examining</div>
+          <p style="color:var(--ink-soft); font-size:.92rem; margin:0;">PhD, DBA, and taught-programme external examiner at universities across the UK, Europe, Australia, and Asia.</p>
+          <div class="tag-cloud">
+            <span class="tag-pill">Essex</span><span class="tag-pill">Worcester</span><span class="tag-pill">Canterbury Christ Church</span>
+            <span class="tag-pill">IIM Ranchi</span><span class="tag-pill">RMIT Melbourne</span><span class="tag-pill">Manchester</span>
+            <span class="tag-pill">Plymouth</span><span class="tag-pill">Bangor</span><span class="tag-pill">Bradford</span>
+            <span class="tag-pill">Cardiff Metropolitan</span><span class="tag-pill">Univ. of the West of Scotland</span>
+            <span class="tag-pill">Coventry</span><span class="tag-pill">Suffolk</span>
+          </div>
+
+          <div class="subhead">Professional memberships</div>
+          <ul class="plain-list">
+            <li>Professional Fellow, Higher Education Academy (PFHEA), UK</li>
+            <li>Member, IEEE Technology and Engineering Management Society</li>
+            <li>Referee, EPSRC and ESRC (UK Research Councils)</li>
+            <li>Referee, The Knowledge Foundation, Sweden</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKS -->
+  <section class="section alt" id="books">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Books</span>
+        <h2>Edited &amp; authored volumes</h2>
+      </div>
+      <div class="book-grid">
+        <div class="book-card">
+          <div class="book-spine" aria-hidden="true"></div>
+          <div>
+            <h4>DigiTech Agility for Business Competitiveness and Innovation Imperatives</h4>
+            <p>Islam, N. &amp; Bhuiyan, S. (Eds.) &middot; IGI Global, 2026 &middot; 478pp</p>
+            <span class="btag">Edited</span>
+          </div>
+        </div>
+        <div class="book-card">
+          <div class="book-spine" aria-hidden="true"></div>
+          <div>
+            <h4>Metaverse Innovation &mdash; Technological, Financial, and Legal Perspectives</h4>
+            <p>Islam, N. &amp; Salami, I. (Eds.) &middot; Springer Nature, 2025 &middot; 331pp</p>
+            <span class="btag">Edited</span>
+          </div>
+        </div>
+        <div class="book-card">
+          <div class="book-spine" aria-hidden="true"></div>
+          <div>
+            <h4>Nanotechnology: Recent Trends, Emerging Issues and Future Directions</h4>
+            <p>Islam, N. (Ed.) &middot; Nova Science Publishers, 2014 &middot; 525pp</p>
+            <span class="btag">Edited</span>
+          </div>
+        </div>
+        <div class="book-card">
+          <div class="book-spine" aria-hidden="true"></div>
+          <div>
+            <h4>Disruptive Technologies, Innovation and Global Redesign: Emerging Implications</h4>
+            <p>Islam, N. &amp; Ekekwe, N. (Eds.) &middot; IGI Global, 2012 &middot; 603pp</p>
+            <span class="btag">Edited</span>
+          </div>
+        </div>
+        <div class="book-card">
+          <div class="book-spine" aria-hidden="true"></div>
+          <div>
+            <h4>Nanotechnology Systems of Innovation: Convergence and Innovation Trend</h4>
+            <p>Islam, N. &middot; Lambert Academic Publishing, 2011 &middot; 196pp</p>
+            <span class="btag">Authored</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Contact</span>
+        <h2>Get in touch</h2>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <div class="contact-row">
+            <div>
+              <div class="contact-label">Email</div>
+              <div class="contact-value" id="emailVal">Nazrul.Islam@uel.ac.uk</div>
+            </div>
+            <button class="copy-btn" data-copy="Nazrul.Islam@uel.ac.uk">Copy</button>
+          </div>
+          <div class="contact-row">
+            <div>
+              <div class="contact-label">Mobile</div>
+              <div class="contact-value">+44 (0) 7946 169078</div>
+            </div>
+            <button class="copy-btn" data-copy="+44 (0) 7946 169078">Copy</button>
+          </div>
+          <div class="contact-row">
+            <div>
+              <div class="contact-label">Office</div>
+              <div class="contact-value">+44 (0) 20 8223 3000</div>
+            </div>
+            <button class="copy-btn" data-copy="+44 (0) 20 8223 3000">Copy</button>
+          </div>
+          <div class="contact-row">
+            <div>
+              <div class="contact-label">Address</div>
+              <div class="contact-value" style="font-weight:400;">Royal Docks School of Business and Law<br>University of East London, London, United Kingdom</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="avail-note">Open to conversations about faculty, research, and academic-leadership roles in the United States.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">&copy; 2026 Nazrul Islam</footer>
+
+<script>
+(function(){
+  try{
+    var toggle = document.getElementById('navToggle');
+    var mobileNav = document.getElementById('mobileNav');
+    if(toggle && mobileNav){
+      toggle.addEventListener('click', function(){
+        var open = mobileNav.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      mobileNav.querySelectorAll('a').forEach(function(a){
+        a.addEventListener('click', function(){
+          mobileNav.classList.remove('open');
+          toggle.setAttribute('aria-expanded','false');
+        });
+      });
+    }
+  }catch(e){}
+
+  try{
+    var nav = document.getElementById('siteNav');
+    window.addEventListener('scroll', function(){
+      nav.classList.toggle('scrolled', window.scrollY > 8);
+    }, { passive:true });
+  }catch(e){}
+
+  try{
+    var links = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+    var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+    if('IntersectionObserver' in window && sections.length){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if(entry.isIntersecting){
+            var id = '#' + entry.target.id;
+            links.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href') === id); });
+          }
+        });
+      }, { rootMargin: '-40% 0px -55% 0px' });
+      sections.forEach(function(s){ io.observe(s); });
+    }
+  }catch(e){}
+
+  try{
+    document.querySelectorAll('.copy-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var text = btn.getAttribute('data-copy');
+        var done = function(){
+          var original = btn.textContent;
+          btn.textContent = 'Copied';
+          setTimeout(function(){ btn.textContent = original; }, 1500);
+        };
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done).catch(function(){
+            fallbackCopy(text); done();
+          });
+        } else {
+          fallbackCopy(text); done();
+        }
+      });
+    });
+    function fallbackCopy(text){
+      try{
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }catch(e){}
+    }
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>
